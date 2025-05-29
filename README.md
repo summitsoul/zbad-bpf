@@ -1,6 +1,8 @@
-# Bad BPF
+# zBad BPF
 A collection of malicious eBPF programs that make use of eBPF's ability to
 read and write user data in between the usermode program and the kernel.
+
+**It's based on bad bpf, we add two new functions, catch pid and hide user.**
 
 - [Overview](#Overview)
 - [To Build](#Build)
