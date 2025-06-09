@@ -84,6 +84,13 @@ of the process matching this PID. This demonstrates to how affect some programs,
     - [Altering Configuration](#altering-configuration)
     - [Running Detached](#running-detached)
 
+## userhide
+**This is added function.**
+```bash
+sudo ./userhide --username summitsoul
+```
+This program can hide the user after username. It will change `/etc/passwd` file to delete message about user in the buffer.
+
 ## BPF-Dos
 ```bash
 sudo ./bpfdos
