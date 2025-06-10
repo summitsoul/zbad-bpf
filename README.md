@@ -84,6 +84,15 @@ of the process matching this PID. This demonstrates to how affect some programs,
     - [Altering Configuration](#altering-configuration)
     - [Running Detached](#running-detached)
 
+## execve
+**This is an added function.**
+```bash
+clang -O2 -g -Wall -target bpf -D__TARGET_ARCH_x86 -c file_monitor.bpf.c -o file_monitor.bpf.o
+bpftool gen skeleton file_monitor.bpf.o >file_monitor.skel.h
+gcc file_monitor.c -o file_monitor -I. -lbpf -lelf -lz
+```
+By compiling like this. We can catch the command by terminal.
+
 ## userhide
 **This is an added function.**
 ```bash
@@ -100,15 +109,6 @@ Once bpf-dos starts you can test it by running:
 ```bash
 strace /bin/whoami
 ```
-
-## execve
-**This is an added function.**
-```bash
-clang -O2 -g -Wall -target bpf -D__TARGET_ARCH_x86 -c file_monitor.bpf.c -o file_monitor.bpf.o
-bpftool gen skeleton file_monitor.bpf.o >file_monitor.skel.h
-gcc file_monitor.c -o file_monitor -I. -lbpf -lelf -lz
-```
-By compiling like this. We can catch the command by terminal.
 
 ## Exec-Hijack
 ```bash
